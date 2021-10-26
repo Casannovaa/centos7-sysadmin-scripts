@@ -3,14 +3,14 @@
 echo Començant...
 sleep 1
 
-		# PreScript rules
+	# PRESCRIPT RULES
 
-yum -y install nano net-tools
+yum -y update && install nano net-tools xclip
 
 
-cat /etc/sysconfig/network-scripts/ifcfg-enp0s3 | grep UUID > uuid.conf
+uuid=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s3 | grep UUID)
 
-echo "
+echo '
 TYPE=Ethernet
 PROXY_METHOD=none
 BROWSER_ONLY=no
@@ -23,18 +23,12 @@ IPV6_DEFROUTE=yes
 IPV6_FAILURE_FATAL=no
 IPV6_ADDR_GEN_MODE=stable-privacy
 NAME=enp0s3
-" > /etc/sysconfig/network-scripts/ifcfg-enp0s3
-cat /etc/sysconfig/network-scripts/uuid.conf >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
-echo "
+UUID='$uuid'
 DEVICE=enp0s3
 ONBOOT=yes
-" >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+' > /etc/sysconfig/network-scripts/ifcfg-enp0s3
 
-
-
-
-
-		# Instal·lació DHCP
+	# INSTAL·LACIÓ I CONFIG DHCP
 
 yum update && yum -y install dhcp
 
@@ -50,7 +44,7 @@ read -p "Domain > " domain
 read -p "Network IP (.0) > " ip
 read -p "Netmask > " mask
 #PREFIX IMPORTANT
-read -p "Prefix > " prefix
+read -p "Prefix (24, 16 or 8) > " prefix
 #PREFIX IMPORTANT
 read -p "Initial IP Range > " initial
 read -p "End IP Range > " end
@@ -75,7 +69,7 @@ subnet '$ip' netmask '$mask' {
 
 sleep 1
 
-cat /etc/sysconfig/network-scripts/ifcfg-enp0s8 | grep UUID > uuid.conf
+uuid8=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s8 | grep UUID)
 
 echo '
 TYPE=Ethernet
@@ -90,27 +84,93 @@ IPV6_DEFROUTE=yes
 IPV6_FAILURE_FATAL=no
 IPV6_ADDR_GEN_MODE=stable-privacy
 NAME=enp0s8
-' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
-cat /etc/sysconfig/network-scripts/uuid.conf >> /etc/sysconfig/network-scripts/ifcfg-enp0s8
-echo '
+UUID='$uuid8'
 DEVICE=enp0s8
 ONBOOT=yes
 IPADDR='$gateway'
 NETMASK='$mask'
 PREFIX='$prefix'
-' >> /etc/sysconfig/network-scripts/ifcfg-enp0s8
+' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
 
+echo iniciando servicio
+sleep 2
 
 	# Iniciar Servei
-
 systemctl start dhcpd
 
 sleep 3
 
 	# Activar Servei
-
 systemctl enable dhcpd
 
 
-		# Routing
+	# ROUTING
 
+echo Routing...
+sleep 1
+
+firewall-cmd --get-active-zone
+
+
+	#identificació de cada rol de interfícies
+nmcli c mod enp0s8 connection.zone internal
+nmcli c mod enp0s3 connection.zone external
+
+	#Confirmació de comandes anteriors
+firewall-cmd --get-active-zone
+
+read -p "Quina es la 'internal'? (Llegeix bé i posa-ho al mil·límetre)> " internal
+read -p "Quina es la 'external'? (Llegeix bé i posa-ho al mil·límetre)> " external
+
+echo Comença el show
+sleep 1
+clear
+
+echo firewall-cmd --zone=external --add-masquerade --permanent
+firewall-cmd --zone=external --add-masquerade --permanent
+
+echo firewall-cmd --reload
+firewall-cmd --reload
+
+echo firewall-cmd --zone=external --query-masquerade
+firewall-cmd --zone=external --query-masquerade
+
+aver=$(cat /proc/sys/net/ipv4/ip_forward)
+if aver=1 
+then
+	cat /proc/sys/net/ipv4/ip_forward
+	echo sale 1, soy JESUCRISTO
+fi
+sleep 1
+echo prosigamos...
+sleep 1
+
+echo firewall-cmd --zone=internal --add-masquerade --permanent
+firewall-cmd --zone=internal --add-masquerade --permanent
+
+sleep 0.5
+
+echo firewall-cmd --reload
+firewall-cmd --reload
+
+sleep 0.5
+
+echo firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o enps0s3 -j MASQUERADE
+firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o enps0s3 -j MASQUERADE
+
+sleep 0.5
+
+echo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s8 -o enps0s3 -j ACCEPT
+firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s8 -o enps0s3 -j ACCEPT
+
+sleep 0.5
+
+echo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s3 -o enps0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
+firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s3 -o enps0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+sleep 0.5
+
+echo firewall-cmd --reload
+firewall-cmd --reload
+
+sleep 0.5
