@@ -7,23 +7,30 @@ sleep 1
 
 # yum -y install nano net-tools xclip
 
+
+cat /etc/sysconfig/network-scripts/ifcfg-enp0s3 | grep UUID > uuid.conf
+
 echo "
 TYPE=Ethernet
 PROXY_METHOD=none
-BROWSER_ONLY=
-BOOTPROTO=
-DEFROUTE=
-IPV4_FAILURE_FATAL=
-IPV6INIT=
-IPV6_AUTOCONF=
-IPV6_DEFROUTE=
-IPV6_FAILURE_FATAL=
-IPV6_ADDR_GEN_MODE=
-NAME=
-UUID=
-DEVICE=
-ONBOOT
-"
+BROWSER_ONLY=no
+BOOTPROTO=dhcp
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=enp0s3
+" > /etc/sysconfig/network-scripts/ifcfg-enp0s3
+cat /etc/sysconfig/network-scripts/uuid.conf >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+echo "
+DEVICE=enp0s3
+ONBOOT=yes
+" >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+
+
 
 
 
@@ -42,6 +49,9 @@ ONBOOT
 read -p "Domain > " domain
 read -p "Network IP (.0) > " ip
 read -p "Netmask > " mask
+#PREFIX IMPORTANT
+read -p "Prefix > " prefix
+#PREFIX IMPORTANT
 read -p "Initial IP Range > " initial
 read -p "End IP Range > " end
 read -p "1º DNS > " dns
@@ -64,6 +74,32 @@ subnet '$ip' netmask '$mask' {
 }'
 
 sleep 1
+
+cat /etc/sysconfig/network-scripts/ifcfg-enp0s8 | grep UUID > uuid.conf
+
+echo '
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=enp0s8
+' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
+cat /etc/sysconfig/network-scripts/uuid.conf >> /etc/sysconfig/network-scripts/ifcfg-enp0s8
+echo '
+DEVICE=enp0s8
+ONBOOT=yes
+IPADDR='$gateway'
+NETMASK='$mask'
+PREFIX='$prefix'
+' >> /etc/sysconfig/network-scripts/ifcfg-enp0s8
+
 
 	# Iniciar Servei
 
