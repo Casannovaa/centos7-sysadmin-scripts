@@ -1,0 +1,56 @@
+#!/bin/bash
+
+echo Començant...
+sleep 1
+
+		# Instal·lació DHCP
+
+#system("yum update && yum upgrade && yum -y install dhcp")
+
+	# Renovació dhcpd.conf
+
+#system("rm -rf /etc/dhcp/dhcpd.conf")
+#system("touch /etc/dhcp/dhcpd.conf")
+
+
+	# dhcpd.conf
+
+read -p "Domain (Entre Comillas) > " domain
+read -p "Network IP (.0) > " ip
+read -p "Netmask > " mask
+read -p "Initial IP Range > " initial
+read -p "End IP Range > " end
+read -p "1º DNS > " dns
+read -p "2º DNS > " dns2
+read -p "Broadcast Address > " broadcast
+read -p "Default Gateway > " gateway
+
+echo "option domain-name $domain;
+option domain-name-servers $ip;
+default-lease-time 86400;
+max-lease-time 172800;
+authorative;
+subnet $ip $mask {
+
+	range dynamic-bootp $initial $end 0;
+	option domain-name-servers $dns $dns2;
+	option broadcast-address $broadcast;
+	option routers $gateway;
+	option domain-name-servers $gateway;
+}" > /proba/etc/dhcp/dhcpd.conf
+
+sleep 1
+
+	# Iniciar Servei
+
+#system("systemctl start dhcpd")
+
+sleep 3
+
+	# Activar Servei
+
+#system("systemctl enable dhcpd")
+
+
+		# Routing
+
