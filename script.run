@@ -5,7 +5,7 @@ sleep 1
 
 		# PreScript rules
 
-# yum -y install nano net-tools xclip
+yum -y install nano net-tools
 
 
 cat /etc/sysconfig/network-scripts/ifcfg-enp0s3 | grep UUID > uuid.conf
@@ -36,12 +36,12 @@ ONBOOT=yes
 
 		# Instal·lació DHCP
 
-#yum update && yum -y install dhcp
+yum update && yum -y install dhcp
 
 	# Renovació dhcpd.conf
 
-#rm -rf /etc/dhcp/dhcpd.conf
-#touch /etc/dhcp/dhcpd.conf
+rm -rf /etc/dhcp/dhcpd.conf
+touch /etc/dhcp/dhcpd.conf
 
 
 	# dhcpd.conf
@@ -103,13 +103,13 @@ PREFIX='$prefix'
 
 	# Iniciar Servei
 
-#systemctl start dhcpd
+systemctl start dhcpd
 
 sleep 3
 
 	# Activar Servei
 
-#systemctl enable dhcpd
+systemctl enable dhcpd
 
 
 		# Routing
