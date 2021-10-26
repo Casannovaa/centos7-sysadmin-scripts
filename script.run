@@ -3,13 +3,26 @@
 echo Començant...
 sleep 1
 
-	# PRESCRIPT RULES
+#PRESCRIPT RULES
 
-yum -y update && install nano net-tools xclip
+echo instalando herramientas necesarias
+sleep 0.5
+yum -y update && install nano net-tools
+clear
 
 
+
+echo haciendo ifups al temario
+sleep 1
+ifup enp0s3
+ifup enp0s8
+clear
+
+
+
+echo configuración enp0s3
+sleep 1
 uuid=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s3 | grep UUID)
-
 echo '
 TYPE=Ethernet
 PROXY_METHOD=none
@@ -27,19 +40,27 @@ UUID='$uuid'
 DEVICE=enp0s3
 ONBOOT=yes
 ' > /etc/sysconfig/network-scripts/ifcfg-enp0s3
+clear
 
-	# INSTAL·LACIÓ I CONFIG DHCP
 
+
+#DHCP
+
+echo install dhcp
+sleep 1
 yum update && yum -y install dhcp
+clear
 
-	# Renovació dhcpd.conf
-
+echo new dhcpd.conf
+sleep 1
 rm -rf /etc/dhcp/dhcpd.conf
 touch /etc/dhcp/dhcpd.conf
+clear
 
 
-	# dhcpd.conf
 
+echo real dhcpd.conf
+sleep 1
 read -p "Domain > " domain
 read -p "Network IP (.0) > " ip
 read -p "Netmask > " mask
@@ -65,12 +86,13 @@ subnet '$ip' netmask '$mask' {
 	option broadcast-address '$broadcast';
 	option routers '$gateway';
 	option domain-name-servers '$gateway';
-}'
+}' > /etc/dhcp/dhcpd.conf
 
+
+
+echo configuración enp0s8
 sleep 1
-
 uuid8=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s8 | grep UUID)
-
 echo '
 TYPE=Ethernet
 PROXY_METHOD=none
@@ -92,35 +114,60 @@ NETMASK='$mask'
 PREFIX='$prefix'
 ' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
 
+
+
 echo iniciando servicio
-sleep 2
-
-	# Iniciar Servei
 systemctl start dhcpd
+sleep 2
+echo si no hay nada, success
 
-sleep 3
-
-	# Activar Servei
+echo activando servicio
 systemctl enable dhcpd
+sleep 2
+echo si no hay nada, success
 
+	
 
-	# ROUTING
+#ROUTING
 
 echo Routing...
 sleep 1
 
+echo firewall-cmd --get-active-zone
 firewall-cmd --get-active-zone
 
+sleep 1
 
 	#identificació de cada rol de interfícies
+echo nmcli c mod enp0s8 connection.zone internal
 nmcli c mod enp0s8 connection.zone internal
+
+sleep 1
+
+echo nmcli c mod enp0s3 connection.zone external
 nmcli c mod enp0s3 connection.zone external
 
+sleep 1
+
 	#Confirmació de comandes anteriors
+echo firewall-cmd --get-active-zone
 firewall-cmd --get-active-zone
 
-read -p "Quina es la 'internal'? (Llegeix bé i posa-ho al mil·límetre)> " internal
-read -p "Quina es la 'external'? (Llegeix bé i posa-ho al mil·límetre)> " external
+sleep 1
+
+#preparació confirmació
+si=$(echo S)
+#confirmació
+read -p "¿¿internal=enp0s8 & external=enp0s3?? (S / N)" confirmacio
+if [ "$confirmacio" == "$si"  ]
+then
+	echo me alegro
+	sleep 1
+else
+	echo pringao
+	sleep 1
+	exit
+fi
 
 echo Comença el show
 sleep 1
@@ -129,14 +176,18 @@ clear
 echo firewall-cmd --zone=external --add-masquerade --permanent
 firewall-cmd --zone=external --add-masquerade --permanent
 
+sleep 1
+
 echo firewall-cmd --reload
 firewall-cmd --reload
+
+sleep 1
 
 echo firewall-cmd --zone=external --query-masquerade
 firewall-cmd --zone=external --query-masquerade
 
 aver=$(cat /proc/sys/net/ipv4/ip_forward)
-if aver=1 
+if [ $aver == 1 ]
 then
 	cat /proc/sys/net/ipv4/ip_forward
 	echo sale 1, soy JESUCRISTO
@@ -148,29 +199,185 @@ sleep 1
 echo firewall-cmd --zone=internal --add-masquerade --permanent
 firewall-cmd --zone=internal --add-masquerade --permanent
 
-sleep 0.5
+sleep 1
 
 echo firewall-cmd --reload
 firewall-cmd --reload
 
-sleep 0.5
+sleep 1
 
 echo firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o enps0s3 -j MASQUERADE
 firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o enps0s3 -j MASQUERADE
 
-sleep 0.5
+sleep 1
 
 echo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s8 -o enps0s3 -j ACCEPT
 firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s8 -o enps0s3 -j ACCEPT
 
-sleep 0.5
+sleep 1
 
 echo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s3 -o enps0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
 firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i enps0s3 -o enps0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
 
-sleep 0.5
+sleep 1
 
 echo firewall-cmd --reload
 firewall-cmd --reload
 
-sleep 0.5
+sleep 1
+
+
+
+#DNS
+
+echo Entrando en el mundo DNS...
+sleep 1
+
+echo cambiando hostname
+read -p "New Hostname > " hostname
+echo $hostname > /etc/hostname
+sleep 1
+clear
+
+
+echo cambiando el dns del servidor
+sleep 1
+echo 'option domain-name "'$domain'";
+option domain-name-servers '$gateway';
+default-lease-time 86400;
+max-lease-time 172800;
+authorative;
+subnet '$ip' netmask '$mask' {
+
+	range dynamic-bootp '$initial' '$end';
+	option domain-name-servers '$dns', '$dns2';
+	option broadcast-address '$broadcast';
+	option routers '$gateway';
+	option domain-name-servers '$gateway';
+}' > /etc/dhcp/dhcpd.conf
+clear
+
+
+
+echo instalando named...
+yum install -y bind bind-utils
+clear
+
+
+echo activando servicio named...
+systemctl enable named
+echo si no hay nada, success
+sleep 1
+
+
+
+clear
+echo se viene pachanga
+
+echo firewall-cmd --permanent --zone=public --add-service=dns
+firewall-cmd --permanent --zone=public --add-service=dns
+
+sleep 1
+
+echo firewall-cmd --permanent --zone=internal --add-service=dns
+firewall-cmd --permanent --zone=internal --add-service=dns
+
+sleep 1
+
+echo firewall-cmd --reload
+firewall-cmd --reload
+
+sleep 1
+clear
+
+
+echo Archivos de configuracion
+read -p "Nuevo dominio (si no sabes deja el "$domain", ENTRE COMILLAS) > " newd
+
+echo '
+//
+// named.conf
+//
+// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS
+// server as a caching only nameserver (as a localhost DNS resolver only).
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+// See the BIND Administrators Reference Manual (ARM) for details about the
+// configuration located in /usr/share/doc/bind-{version}/Bv9ARM.html
+
+options {
+	listen-on port 53 { 127.0.0.1; '$gateway'; };
+	#listen-on-v6 port 53 { ::1; };
+	directory 	"/var/named";
+	dump-file 	"/var/named/data/cache_dump.db";
+	statistics-file "/var/named/data/named_stats.txt";
+	memstatistics-file "/var/named/data/named_mem_stats.txt";
+	recursing-file  "/var/named/data/named.recursing";
+	secroots-file   "/var/named/data/named.secroots";
+	allow-query     { any; };
+
+	/* 
+	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+	 - If you are building a RECURSIVE (caching) DNS server, you need to enable 
+	   recursion. 
+	 - If your recursive DNS server has a public IP address, you MUST enable access 
+	   control to limit queries to your legitimate users. Failing to do so will
+	   cause your server to become part of large scale DNS amplification 
+	   attacks. Implementing BCP38 within your network would greatly
+	   reduce such attack surface 
+	*/
+	recursion yes;
+
+	dnssec-enable yes;
+	dnssec-validation yes;
+
+	/* Path to ISC DLV key */
+	bindkeys-file "/etc/named.root.key";
+
+	managed-keys-directory "/var/named/dynamic";
+
+	pid-file "/run/named/named.pid";
+	session-keyfile "/run/named/session.key";
+};
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+zone '$newd' IN {
+	type master;
+	file "named.'$newd'";
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+' > /etc/named.conf
+
+
+
+echo '
+# BIND named process options
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# OPTIONS="-4"     --  These additional options will be passed to named
+#                            at startup. Dont add -t here, enable proper
+#                            -chroot.service unit file.
+#                            Use of parameter -c is not supported here. Extend
+#                            systemd named*.service instead. For more
+#                            information please read the following KB article:
+#                            https://access.redhat.com/articles/2986001
+#
+# DISABLE_ZONE_CHECKING  --  By default, service file calls named-checkzone
+#                            utility for every zone to ensure all zones are
+#                            valid before named starts. If you set this option
+#                            to "yes" then service file doesnt perform those
+#                            checks.
+' > /etc/sysconfig/named
+
+
+
+echo ULTIMO PA MAÑANA
