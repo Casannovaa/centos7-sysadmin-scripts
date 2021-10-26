@@ -3,14 +3,38 @@
 echo Començant...
 sleep 1
 
+		# PreScript rules
+
+# yum -y install nano net-tools xclip
+
+echo "
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=
+BOOTPROTO=
+DEFROUTE=
+IPV4_FAILURE_FATAL=
+IPV6INIT=
+IPV6_AUTOCONF=
+IPV6_DEFROUTE=
+IPV6_FAILURE_FATAL=
+IPV6_ADDR_GEN_MODE=
+NAME=
+UUID=
+DEVICE=
+ONBOOT
+"
+
+
+
 		# Instal·lació DHCP
 
-#system("yum update && yum upgrade && yum -y install dhcp")
+#yum update && yum -y install dhcp
 
 	# Renovació dhcpd.conf
 
-#system("rm -rf /etc/dhcp/dhcpd.conf")
-#system("touch /etc/dhcp/dhcpd.conf")
+#rm -rf /etc/dhcp/dhcpd.conf
+#touch /etc/dhcp/dhcpd.conf
 
 
 	# dhcpd.conf
@@ -25,7 +49,7 @@ read -p "2º DNS > " dns2
 read -p "Broadcast Address > " broadcast
 read -p "Default Gateway > " gateway
 
-echo "option domain-name $domain;
+echo 'option domain-name "'$domain'";
 option domain-name-servers $ip;
 default-lease-time 86400;
 max-lease-time 172800;
@@ -37,20 +61,21 @@ subnet $ip $mask {
 	option broadcast-address $broadcast;
 	option routers $gateway;
 	option domain-name-servers $gateway;
-}" > /proba/etc/dhcp/dhcpd.conf
+}'
 
 sleep 1
 
 	# Iniciar Servei
 
-#system("systemctl start dhcpd")
+#systemctl start dhcpd
 
 sleep 3
 
 	# Activar Servei
 
-#system("systemctl enable dhcpd")
+#systemctl enable dhcpd
 
 
 		# Routing
+
 
