@@ -39,7 +39,7 @@ ONBOOT
 
 	# dhcpd.conf
 
-read -p "Domain (Entre Comillas) > " domain
+read -p "Domain > " domain
 read -p "Network IP (.0) > " ip
 read -p "Netmask > " mask
 read -p "Initial IP Range > " initial
@@ -50,17 +50,17 @@ read -p "Broadcast Address > " broadcast
 read -p "Default Gateway > " gateway
 
 echo 'option domain-name "'$domain'";
-option domain-name-servers $ip;
+option domain-name-servers '$ip';
 default-lease-time 86400;
 max-lease-time 172800;
 authorative;
-subnet $ip $mask {
+subnet '$ip' netmask '$mask' {
 
-	range dynamic-bootp $initial $end 0;
-	option domain-name-servers $dns $dns2;
-	option broadcast-address $broadcast;
-	option routers $gateway;
-	option domain-name-servers $gateway;
+	range dynamic-bootp '$initial' '$end';
+	option domain-name-servers '$dns', '$dns2';
+	option broadcast-address '$broadcast';
+	option routers '$gateway';
+	option domain-name-servers '$gateway';
 }'
 
 sleep 1
@@ -77,5 +77,4 @@ sleep 3
 
 
 		# Routing
-
 
