@@ -1,0 +1,14 @@
+$TTL	1D
+@	IN	SOA	alexsumoy.aulasmx2.cat.	root.aulasm2.cat.	(
+				202107101	; serial
+				604800	; refresh
+				86400	; retry
+				2419200	; expiration
+				604800 ; TTL negative cache
+  );
+; Servidors de noms
+@		IN	NS	alexsumoy.aulasmx2.cat.
+
+; Registres
+alexsumoy	IN	A	172.128.10.1
+ftp		IN	A	172.128.10.1
