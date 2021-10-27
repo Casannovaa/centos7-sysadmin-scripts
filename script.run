@@ -1,3 +1,36 @@
+
+Skip to content
+Pulls
+Issues
+Marketplace
+Explore
+@Gilimm
+Gilimm /
+centos
+Public
+
+0
+0
+
+    0
+
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+
+More
+centos/script.run
+@Gilimm
+Gilimm Update script.run
+Latest commit f3790ea 10 hours ago
+History
+1 contributor
+383 lines (285 sloc) 8.16 KB
 #!/bin/bash
 
 echo Començant...
@@ -80,7 +113,6 @@ default-lease-time 86400;
 max-lease-time 172800;
 authorative;
 subnet '$ip' netmask '$mask' {
-
 	range dynamic-bootp '$initial' '$end';
 	option domain-name-servers '$dns', '$dns2';
 	option broadcast-address '$broadcast';
@@ -248,7 +280,6 @@ default-lease-time 86400;
 max-lease-time 172800;
 authorative;
 subnet '$ip' netmask '$mask' {
-
 	range dynamic-bootp '$initial' '$end';
 	option domain-name-servers '$dns', '$dns2';
 	option broadcast-address '$broadcast';
@@ -293,7 +324,14 @@ clear
 
 echo Archivos de configuracion
 read -p "Nuevo dominio (si no sabes deja el "$domain", ENTRE COMILLAS) > " newd
+read -p "Mismo que antes pero ponle root antes (josefina.aulasmx2.cat --> root.aulasmx2.cat) > " newrootd
+read -p "Lo mateix que el primer, pero sense el ultim punt (josefina.aulasmx2.cat --> josefina) > " name1
+read -p "Segon usuari (a la practica, era el 'ftp') > " name2
+read -p "Lo mateix que el primer, pero sense el nom (josefina.aulasmx2.cat --> aulasmx2.cat [SENSE EL PUNT]) > " ruta
+read -p "Serial (Si no saps, deixa'l com a 1 [segurament estigui en el enunciat])" serial
 
+
+echo nano /etc/named.conf
 echo '
 //
 // named.conf
@@ -305,7 +343,6 @@ echo '
 //
 // See the BIND Administrators Reference Manual (ARM) for details about the
 // configuration located in /usr/share/doc/bind-{version}/Bv9ARM.html
-
 options {
 	listen-on port 53 { 127.0.0.1; '$gateway'; };
 	#listen-on-v6 port 53 { ::1; };
@@ -316,7 +353,6 @@ options {
 	recursing-file  "/var/named/data/named.recursing";
 	secroots-file   "/var/named/data/named.secroots";
 	allow-query     { any; };
-
 	/* 
 	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
 	 - If you are building a RECURSIVE (caching) DNS server, you need to enable 
@@ -328,37 +364,30 @@ options {
 	   reduce such attack surface 
 	*/
 	recursion yes;
-
 	dnssec-enable yes;
 	dnssec-validation yes;
-
 	/* Path to ISC DLV key */
 	bindkeys-file "/etc/named.root.key";
-
 	managed-keys-directory "/var/named/dynamic";
-
 	pid-file "/run/named/named.pid";
 	session-keyfile "/run/named/session.key";
 };
-
 logging {
         channel default_debug {
                 file "data/named.run";
                 severity dynamic;
         };
 };
-
 zone '$newd' IN {
 	type master;
 	file "named.'$newd'";
 };
-
 include "/etc/named.rfc1912.zones";
 include "/etc/named.root.key";
 ' > /etc/named.conf
 
 
-
+echo nano /etc/sysconfig/named
 echo '
 # BIND named process options
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -380,4 +409,80 @@ echo '
 
 
 
-echo ULTIMO PA MAÑANA
+
+echo '
+$TTL    1D
+@       IN      SOA     '$newd'. '$newrootd'. (
+                            '$serial'       ; serial
+                            604800  ; refresh
+                            86400   ; retry
+                            2419200 ; expiration
+                            604800  ; TTL negative cache
+    );
+; Servidors de noms
+ @              IN      NS      '$newd'.
+ 
+; Registres
+'$name1'       IN      A       '$gateway'
+'$name2'       IN      A       '$gateway'
+' > /var/named/named.$ruta
+
+
+
+clear
+
+echo named-checkconf
+named-checkconf
+sleep 2
+confirmationfinal=$(echo S)
+read -p "Todo bien?? (S/N) > " checkconf
+
+if [ "$checkconf" == "$confirmationfinal" ]
+then
+	echo Genial!
+else
+	echo jaja pringao
+	exit
+fi
+
+echo Iniciando servicio
+	systemctl start named
+	sleep 2
+	echo si no sale nada, success
+	echo .
+	sleep 1
+	Activando servicio
+	systemctl start named
+	sleep 2
+	echo si no sale nada, success
+
+
+
+named-checkzone $ruta /var/named/named.$ruta
+confirmationfinal=$(echo S)
+read -p "Todo bien?? (S/N) > " checkconf
+if [ "$checkconf" == "$confirmationfinal" ]
+then
+	echo Genial!
+else
+	echo jaja pringao
+	exit
+fi
+
+
+
+echo reloading servicio
+systemctl reload named
+
+
+
+confirmationfinal=$(echo S)
+read -p "Parece que todo genial (S/N) > " checkconf
+
+if [ "$checkconf" == "$confirmationfinal" ]
+then
+	echo SUCCESS!
+else
+	echo jaja pringao
+	exit
+fi
