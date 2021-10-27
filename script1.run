@@ -61,3 +61,11 @@ IPADDR='$gateway'
 NETMASK='$mask'
 PREFIX='$prefix'
 ' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
+sleep 1
+echo Trabajo terminado, reiniciamos el ordenador en 3...
+sleep 1
+echo 2...
+sleep 1
+echo 1...
+echo ya
+reboot
