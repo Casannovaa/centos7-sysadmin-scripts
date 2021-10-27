@@ -2,7 +2,7 @@
 
 echo instalando herramientas necesarias
 sleep 0.5
-yum -y update && install nano net-tools
+install nano net-tools
 clear
 
 
