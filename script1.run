@@ -29,7 +29,7 @@ IPV6_DEFROUTE=yes
 IPV6_FAILURE_FATAL=no
 IPV6_ADDR_GEN_MODE=stable-privacy
 NAME=enp0s3
-UUID='$uuid'
+'$uuid'
 DEVICE=enp0s3
 ONBOOT=yes
 ' > /etc/sysconfig/network-scripts/ifcfg-enp0s3
@@ -54,7 +54,7 @@ IPV6_DEFROUTE=yes
 IPV6_FAILURE_FATAL=no
 IPV6_ADDR_GEN_MODE=stable-privacy
 NAME=enp0s8
-UUID='$uuid8'
+'$uuid8'
 DEVICE=enp0s8
 ONBOOT=yes
 IPADDR='$gateway'
