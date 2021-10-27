@@ -1,36 +1,3 @@
-
-Skip to content
-Pulls
-Issues
-Marketplace
-Explore
-@Gilimm
-Gilimm /
-centos
-Public
-
-0
-0
-
-    0
-
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-
-More
-centos/script.run
-@Gilimm
-Gilimm Update script.run
-Latest commit f3790ea 10 hours ago
-History
-1 contributor
-383 lines (285 sloc) 8.16 KB
 #!/bin/bash
 
 echo Començant...
@@ -486,3 +453,4 @@ else
 	echo jaja pringao
 	exit
 fi
+
