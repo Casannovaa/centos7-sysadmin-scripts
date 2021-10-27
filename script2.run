@@ -29,7 +29,7 @@ echo 'option domain-name "'$domain'";
 option domain-name-servers '$ip';
 default-lease-time 86400;
 max-lease-time 172800;
-authorative;
+authoritative;
 subnet '$ip' netmask '$mask' {
 	range dynamic-bootp '$initial' '$end';
 	option domain-name-servers '$dns', '$dns2';
