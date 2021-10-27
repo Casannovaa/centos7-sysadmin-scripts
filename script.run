@@ -3,49 +3,12 @@
 echo Començant...
 sleep 1
 
-#PRESCRIPT RULES
-
-echo instalando herramientas necesarias
-sleep 0.5
-yum -y update && install nano net-tools
-clea
-
-
-echo configuración enp0s3
-sleep 1
-uuid=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s3 | grep UUID)
-echo '
-TYPE=Ethernet
-PROXY_METHOD=none
-BROWSER_ONLY=no
-BOOTPROTO=dhcp
-DEFROUTE=yes
-IPV4_FAILURE_FATAL=no
-IPV6INIT=yes
-IPV6_AUTOCONF=yes
-IPV6_DEFROUTE=yes
-IPV6_FAILURE_FATAL=no
-IPV6_ADDR_GEN_MODE=stable-privacy
-NAME=enp0s3
-UUID='$uuid'
-DEVICE=enp0s3
-ONBOOT=yes
-' > /etc/sysconfig/network-scripts/ifcfg-enp0s3
-clear
-
-
 
 #DHCP
 
 echo install dhcp
 sleep 1
-yum update && yum -y install dhcp
-clear
-
-echo new dhcpd.conf
-sleep 1
-rm -rf /etc/dhcp/dhcpd.conf
-touch /etc/dhcp/dhcpd.conf
+yum -y install dhcp
 clear
 
 
@@ -55,9 +18,6 @@ sleep 1
 read -p "Domain > " domain
 read -p "Network IP (.0) > " ip
 read -p "Netmask > " mask
-#PREFIX IMPORTANT
-read -p "Prefix (24, 16 or 8) > " prefix
-#PREFIX IMPORTANT
 read -p "Initial IP Range > " initial
 read -p "End IP Range > " end
 read -p "1º DNS > " dns
@@ -77,32 +37,6 @@ subnet '$ip' netmask '$mask' {
 	option routers '$gateway';
 	option domain-name-servers '$gateway';
 }' > /etc/dhcp/dhcpd.conf
-
-
-
-echo configuración enp0s8
-sleep 1
-uuid8=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s8 | grep UUID)
-echo '
-TYPE=Ethernet
-PROXY_METHOD=none
-BROWSER_ONLY=no
-BOOTPROTO=none
-DEFROUTE=yes
-IPV4_FAILURE_FATAL=no
-IPV6INIT=yes
-IPV6_AUTOCONF=yes
-IPV6_DEFROUTE=yes
-IPV6_FAILURE_FATAL=no
-IPV6_ADDR_GEN_MODE=stable-privacy
-NAME=enp0s8
-UUID='$uuid8'
-DEVICE=enp0s8
-ONBOOT=yes
-IPADDR='$gateway'
-NETMASK='$mask'
-PREFIX='$prefix'
-' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
 
 
 
