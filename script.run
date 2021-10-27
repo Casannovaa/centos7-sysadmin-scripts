@@ -14,7 +14,6 @@ clear
 
 echo haciendo ifups al temario
 sleep 1
-ifup enp0s3
 ifup enp0s8
 clear
 
