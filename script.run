@@ -8,15 +8,7 @@ sleep 1
 echo instalando herramientas necesarias
 sleep 0.5
 yum -y update && install nano net-tools
-clear
-
-
-
-echo haciendo ifups al temario
-sleep 1
-ifup enp0s8
-clear
-
+clea
 
 
 echo configuración enp0s3
