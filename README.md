@@ -1,5 +1,5 @@
-# centos
-INSTRUCCIONES
+# CentOS Server Automation Scripts
+Instructions
 
 1. ifup the interface 8 before running anything!!! >> (ifup enp0s8)
 2. Set execution permissions to the scripts >> (chmod +x /centos/*)
