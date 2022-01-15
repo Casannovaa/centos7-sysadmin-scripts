@@ -2,26 +2,27 @@
 
 #Routing
 
-echo Routing...
+echo "Routing..."
 sleep 1
 
-echo firewall-cmd --get-active-zone
+echo "firewall-cmd --get-active-zone"
 firewall-cmd --get-active-zone
 sleep 1
 
-
+read -p "External network interface ¿enp0s3? > " ifext
+read -p "Internal network interface ¿enp0s8? > " ifint 
 
 # Assignation of Interfaces Rol
-echo nmcli c mod $ifint connection.zone internal
+echo "nmcli c mod $ifint connection.zone internal"
 nmcli c mod $ifint connection.zone internal
 sleep 1
 
-echo nmcli c mod $ifext connection.zone external
+echo "nmcli c mod $ifext connection.zone external"
 nmcli c mod $ifint connection.zone external
 sleep 1
 
 # Assignation Confirmation
-echo firewall-cmd --get-active-zone
+echo "firewall-cmd --get-active-zone"
 firewall-cmd --get-active-zone
 
 sleep 1
@@ -36,61 +37,61 @@ else
 	exit
 fi
 
-echo firewall-cmd --zone=external --add-masquerade --permanent
+echo "firewall-cmd --zone=external --add-masquerade --permanent"
 firewall-cmd --zone=external --add-masquerade --permanent
 sleep 1
 
-echo firewall-cmd --reload
+echo "firewall-cmd --reload"
 firewall-cmd --reload
 sleep 1
 
-echo firewall-cmd --zone=external --query-masquerade
+echo "firewall-cmd --zone=external --query-masquerade"
 firewall-cmd --zone=external --query-masquerade
 
 aver=$(cat /proc/sys/net/ipv4/ip_forward)
 if [ "$aver" == "1" ]
 then
 	cat /proc/sys/net/ipv4/ip_forward
-	echo It seems ok...
+	echo "It seems ok..."
     sleep 1
 fi
 
-echo firewall-cmd --zone=internal --add-masquerade --permanent
+echo "firewall-cmd --zone=internal --add-masquerade --permanent"
 firewall-cmd --zone=internal --add-masquerade --permanent
 sleep 1
 
-echo firewall-cmd --reload
+echo "firewall-cmd --reload"
 firewall-cmd --reload
 sleep 1
 
-echo firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o "$ifext" -j MASQUERADE
+echo "firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o "$ifext" -j MASQUERADE"
 firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o "$ifext" -j MASQUERADE
 sleep 1
 
-echo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i "$ifint" -o "$ifext" -j ACCEPT
+echo "firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i "$ifint" -o "$ifext" -j ACCEPT"
 firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i "$ifint" -o "$ifext" -j ACCEPT
 sleep 1
 
-echo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i "$ifext" -o "$ifint" -m state --state RELATED,ESTABLISHED -j ACCEPT
+echo "firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i "$ifext" -o "$ifint" -m state --state RELATED,ESTABLISHED -j ACCEPT"
 firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i "$ifext" -o "$ifint" -m state --state RELATED,ESTABLISHED -j ACCEPT
 sleep 1
 
-echo firewall-cmd --reload
+echo "firewall-cmd --reload"
 firewall-cmd --reload
 sleep 1
 
 
-echo It should have been succesfully activated! :D
+echo "It should have been succesfully activated! :D"
 sleep 1
 
 read -p 'Do you want to reboot to confirm the configuration (JIC) [Y / N]' bye
 if [ "$bye" == "Y" ]
 then
-    echo Rebooting...
+    echo "Rebooting..."
     reboot
 else
     clear
-    echo Enjoy!
+    echo "Enjoy!"
     sleep 1
     clear
 fi
