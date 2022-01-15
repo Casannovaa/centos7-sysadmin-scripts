@@ -18,7 +18,7 @@ nmcli c mod $ifint connection.zone internal
 sleep 1
 
 echo "nmcli c mod $ifext connection.zone external"
-nmcli c mod $ifint connection.zone external
+nmcli c mod $ifext connection.zone external
 sleep 1
 
 # Assignation Confirmation
