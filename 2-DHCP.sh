@@ -1,9 +1,5 @@
 #!/bin/bash
 
-sudo echo Començant...
-sleep 1
-clear
-
 #DHCP Deamon Installation
 echo install dhcp
 sleep 1
@@ -12,7 +8,7 @@ clear
 
 # Variables Gathering & Assignation
 read -p "Domain > " domain
-read -p "Network IP (.0) > " ip
+read -p "Network IP (.0) > " ipp
 read -p "Netmask > " mask
 read -p "Initial IP Range > " initial
 read -p "End IP Range > " end
@@ -23,7 +19,7 @@ read -p "Default Gateway > " gateway
 
 # /etc/dhcp/dhcpd.conf Configuration
 echo 'option domain-name "'$domain'";
-option domain-name-servers '$ip';
+option domain-name-servers '$ipp';
 default-lease-time 86400;
 max-lease-time 172800;
 authoritative;
