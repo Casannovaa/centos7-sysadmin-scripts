@@ -15,8 +15,8 @@ nmcli c mod $ifext connection.zone external
 firewall-cmd --get-active-zone
 
 # It's all alright?
-read -p "¿¿internal=$ifint & external=$ifext?? (S / N)" confirmacio
-if [ "$confirmacio" == "S"  ]
+read -p "¿¿internal=$ifint & external=$ifext?? [Y / N]" confir
+if [ "$confir" == "Y"  ]
 then
 	echo Nice!
 	sleep 1
@@ -28,8 +28,8 @@ firewall-cmd --zone=external --add-masquerade --permanent
 firewall-cmd --reload
 firewall-cmd --zone=external --query-masquerade
 
-aver=$(cat /proc/sys/net/ipv4/ip_forward)
-if [ "$aver" == "1" ]
+confi=$(cat /proc/sys/net/ipv4/ip_forward)
+if [ "$confi" == "1" ]
 then
 	cat /proc/sys/net/ipv4/ip_forward
 	echo "It seems ok..."
@@ -43,15 +43,5 @@ firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i $ifint -o $ifext -j AC
 firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i $ifext -o $ifint -m state --state RELATED,ESTABLISHED -j ACCEPT
 firewall-cmd --reload
 
-read -p 'Do you want to reboot to confirm the configuration (JIC) [Y / N]' bye
-if [ "$bye" == "Y" ]
-then
-    echo "Rebooting..."
-    sleep 1
-    reboot
-else
-    clear
-    echo "Enjoy!"
-    sleep 1
-    clear
-fi
+clear
+echo "Succesfully Configured"
