@@ -175,5 +175,16 @@ setsebool -P ftpd_full_access on
 firewall-cmd --add-service=ftp --zone=internal --permanent
 firewall-cmd --reload
 
-clear
-echo "Done"
+# DNS Entry for FTP Server
+read -p "Do you want to add a DNS entry for the FTP server? [Y/N] --> " dnsftp
+if [[ $dnsftp == "Y" ]]
+then
+read -p "Internal network interface? (¿enp0s8?) --> " intif
+servip=$(ip a | grep "inet" | grep $intif | awk '{print $2}' | awk -F / '{print $1}')
+ddom=$(cat /etc/dhcp/dhcpd.conf | grep "option domain-name " | awk -F \" '{print $2}')
+read -p "name of entry (¿ftp?) --> " ftpentry
+echo "$ftpentry     IN      A       $servip" >> /var/named/"$ddom"
+else "Dope"
+fi
+
+echo "DONE"
