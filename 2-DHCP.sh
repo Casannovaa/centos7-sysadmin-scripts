@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #DHCP Deamon Installation
-echo install dhcp
+echo "Installing DHCP..."
 sleep 1
 yum -y install dhcp
 clear
@@ -35,10 +35,8 @@ subnet '$ip' netmask '$mask' {
 # DHCP Daemon Initialization
 echo Starting Service
 systemctl start dhcpd
-sleep 1
 echo "If nothing appeared, it's all ok"
+sleep 2
 
 echo Activating Service
 systemctl enable dhcpd
-sleep 1
-echo "If nothing appeared, it's all ok"
