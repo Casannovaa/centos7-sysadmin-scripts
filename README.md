@@ -1,4 +1,7 @@
-# CentOS Server Automation Scripts
+# CentOS Server Automation Scripts (VM)
+
+[Tested on Virtualbox & CentOS7]
+
 Instructions
 
 1. ifup the interface 8 before running anything!!! >> (ifup enp0s8)
