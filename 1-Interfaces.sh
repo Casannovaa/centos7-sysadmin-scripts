@@ -1,20 +1,17 @@
 #!/bin/bash
 
-echo instalando herramientas necesarias
+# Installation of Tools
+echo "Installing Basic Tools"
 sleep 0.5
 yum -y install nano net-tools
-clear
 
-
-
+# Information Gathering for Interface Configuration
 read -p "Netmask > " mask
 read -p "Prefix (24, 16 or 8) > " prefix
 read -p "Default Gateway > " gateway
 
-
-
-echo configuración enp0s3
-sleep 1
+# Interfaces Configuration
+echo "Configuring enp0s3..."
 uuid=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s3 | grep UUID)
 echo '
 TYPE=Ethernet
@@ -33,13 +30,8 @@ NAME=enp0s3
 DEVICE=enp0s3
 ONBOOT=yes
 ' > /etc/sysconfig/network-scripts/ifcfg-enp0s3
-clear
-sleep 1
 
-
-
-echo configuración enp0s8
-sleep 1
+echo "Configuring enp0s8..."
 uuid8=$(cat /etc/sysconfig/network-scripts/ifcfg-enp0s8 | grep UUID)
 echo '
 TYPE=Ethernet
@@ -61,6 +53,7 @@ IPADDR='$gateway'
 NETMASK='$mask'
 PREFIX='$prefix'
 ' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
+
 echo Rebooting...
 sleep 1
-reboot
+/sbin/reboot
