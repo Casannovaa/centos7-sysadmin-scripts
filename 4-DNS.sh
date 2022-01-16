@@ -134,4 +134,4 @@ echo "
 
 ; Registres
 $name       IN      A       $servip
-" > /var/named."$ddom"
+" > /var/named/named."$ddom"
