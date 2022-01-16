@@ -116,8 +116,8 @@ echo '
 #                            to *yes* then service file doesnt perform those
 #                            checks.' > /etc/sysconfig/named
 
-hst=$(hostname)
-name=$(hostname | awk -F . '{print $1}')
+hst=$(cat /etc/hostname)
+name=$(cat /etc/hostname | awk -F . '{print $1}')
 
 echo "
 \$TTL    1D
@@ -133,5 +133,4 @@ echo "
 @               IN      NS      $hst.
 
 ; Registres
-$name       IN      A       $servip
-" > /var/named/named."$ddom"
+$name       IN      A       $servip" > /var/named."$ddom"
