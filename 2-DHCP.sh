@@ -1,58 +1,48 @@
 #!/bin/bash
 
-#Routing
-echo "Routing..."
-firewall-cmd --get-active-zone
+sudo echo Començant...
+sleep 1
+clear
 
-read -p "External network interface ¿enp0s3? > " ifext
-read -p "Internal network interface ¿enp0s8? > " ifint 
+#DHCP Deamon Installation
+echo install dhcp
+sleep 1
+yum -y install dhcp
+clear
 
-# Assignation of Interfaces Rol
-nmcli c mod $ifint connection.zone internal
-nmcli c mod $ifext connection.zone external
+# Variables Gathering & Assignation
+read -p "Domain > " domain
+read -p "Network IP (.0) > " ip
+read -p "Netmask > " mask
+read -p "Initial IP Range > " initial
+read -p "End IP Range > " end
+read -p "DNS > " dns
+read -p "Broadcast Address > " broadcast
+read -p "Default Gateway > " gateway
 
-# Assignation Confirmation
-firewall-cmd --get-active-zone
 
-# It's all alright?
-read -p "¿¿internal=$ifint & external=$ifext?? (S / N)" confirmacio
-if [ "$confirmacio" == "S"  ]
-then
-	echo Nice!
-	sleep 1
-else
-	exit
-fi
+# /etc/dhcp/dhcpd.conf Configuration
+echo 'option domain-name "'$domain'";
+option domain-name-servers '$ip';
+default-lease-time 86400;
+max-lease-time 172800;
+authoritative;
+subnet '$ip' netmask '$mask' {
+	range dynamic-bootp '$initial' '$end';
+	option domain-name-servers '$gateway', '$dns';
+	option broadcast-address '$broadcast';
+	option routers '$gateway';
+	option domain-name-servers '$gateway';
+}' > /etc/dhcp/dhcpd.conf
 
-# Coniguration of Interface Forwarding
-firewall-cmd --zone=external --add-masquerade --permanent
-firewall-cmd --reload
-firewall-cmd --zone=external --query-masquerade
 
-aver=$(cat /proc/sys/net/ipv4/ip_forward)
-if [ "$aver" == "1" ]
-then
-	cat /proc/sys/net/ipv4/ip_forward
-	echo "It seems ok..."
-    sleep 1
-fi
+# DHCP Daemon Initialization
+echo Starting Service
+systemctl start dhcpd
+sleep 1
+echo "If nothing appeared, it's all ok"
 
-firewall-cmd --zone=internal --add-masquerade --permanent
-firewall-cmd --reload
-firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o $ifext -j MASQUERADE
-firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i $ifint -o $ifext -j ACCEPT
-firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i $ifext -o $ifint -m state --state RELATED,ESTABLISHED -j ACCEPT
-firewall-cmd --reload
-
-read -p 'Do you want to reboot to confirm the configuration (JIC) [Y / N]' bye
-if [ "$bye" == "Y" ]
-then
-    echo "Rebooting..."
-    sleep 1
-    reboot
-else
-    clear
-    echo "Enjoy!"
-    sleep 1
-    clear
-fi
+echo Activating Service
+systemctl enable dhcpd
+sleep 1
+echo "If nothing appeared, it's all ok"
