@@ -8,7 +8,7 @@ read -p "Internal network interface? (¿enp0s8?) --> " intif
 servip=$(ip a | grep "inet" | grep $intif | awk '{print $2}' | awk -F / '{print $1}')
 ddom=$(cat /etc/dhcp/dhcpd.conf | grep "option domain-name " | awk -F \" '{print $2}')
 read -p "name of entry (¿mail?) --> " mailentry
-echo "$mailentry     IN      A       $servip" >> /var/named/"$ddom"
+echo "$mailentry     IN      A       $servip" >> /var/named/named."$ddom"
 else "Dope"
 fi
 
@@ -19,6 +19,8 @@ systemctl restart named
 yum -y install postfix
 
 # /etc/postfix/main.cf configuration
+rm -rf /etc/postfix/main.cf
+
 echo "
 # Global Postfix configuration file. This file lists only a subset
 # of all parameters. For the syntax, and for a complete parameter
@@ -709,9 +711,7 @@ smtpd_sasl_path = private/auth
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
 smtpd_sasl_local_domain = \$myhostname
-smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | base64 > /etc/postfix/main.cfbase
-cat /etc/postfix/main.cfbase | base64 -d > /etc/postfix/main.cf
-rm /etc/postfix/main.cfbase
+smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | tee /etc/postfix/main.cf
 
 # Deamon Restart
 systemctl restart postfix
