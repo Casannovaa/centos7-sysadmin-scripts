@@ -962,7 +962,7 @@ auth_mechanisms = plain login
 #!include auth-checkpassword.conf.ext
 #!include auth-vpopmail.conf.ext
 #!include auth-static.conf.ext
-" > /etc/dovecot/conff.d/10-auth.conf
+" > /etc/dovecot/conf.d/10-auth.conf
 
 # conf.d/10-mail.conf
 echo "
