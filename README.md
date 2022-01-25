@@ -4,7 +4,7 @@
 
 Instructions
 
-1. ifup the interface 8 before running anything!!! >> (ifup enp0s8)
+1. ifup the interface 3 before running anything!!! >> (ifup enp0s3)
 2. Set execution permissions to the scripts >> (chmod +x /centos/*)
 3. Execute the first script (./1-configure-interfaces.run)
 4. First script will reboot your VM
