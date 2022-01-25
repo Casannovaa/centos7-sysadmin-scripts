@@ -708,8 +708,9 @@ smtpd_sasl_path = private/auth
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
 smtpd_sasl_local_domain = \$myhostname
-smtpd_recipient_restrictions = permit_mynetworks, permit_auth_destination, permit_sasl_authenticated, reject
-" > /etc/postfix/main.cf
+smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | base64 > /etc/postfix/main.cfbase
+cat /etc/postfix/main.cfbase | base64 -d > /etc/postfix/main.cf
+rm /etc/postfix/main.cfbase
 
 # Deamon Restart
 systemctl restart postfix
@@ -1376,8 +1377,7 @@ mbox_write_locks = fcntl
 #     never consider the matched MIME part as attachment. Including will only
 #     negate an exclusion (e.g. content-type=!foo/* content-type=foo/bar).
 #   exclude-inlined - Exclude any Content-Disposition=inline MIME part.
-#mail_attachment_detection_options =
-" > /etc/dovecot/conf.d/10-mail.conf
+#mail_attachment_detection_options = " > /etc/dovecot/conf.d/10-mail.conf
 
 # conf.d/10-master.conf
 echo "
@@ -1569,8 +1569,7 @@ ssl_key = </etc/pki/dovecot/private/dovecot.pem
 # SSL extra options. Currently supported options are:
 #   no_compression - Disable compression.
 #   no_ticket - Disable SSL session tickets.
-#ssl_options =
-" > /etc/dovecot/conf.d/10-ssl.conf
+#ssl_options = " > /etc/dovecot/conf.d/10-ssl.conf
 
 # Daemon Restart
 systemctl start dovecot
