@@ -20,7 +20,6 @@ yum -y install postfix
 
 # /etc/postfix/main.cf configuration
 rm -rf /etc/postfix/main.cf
-
 echo "
 # Global Postfix configuration file. This file lists only a subset
 # of all parameters. For the syntax, and for a complete parameter
@@ -570,9 +569,7 @@ home_mailbox = Maildir/
 # For details, see \"man header_checks\".
 #
 #header_checks = regexp:/etc/postfix/header_checks
-" > /etc/postfix/main.cf
 
-echo "
 # FAST ETRN SERVICE
 #
 # Postfix maintains per-destination logfiles with information about
@@ -713,8 +710,7 @@ smtpd_sasl_path = private/auth
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
 smtpd_sasl_local_domain = \$myhostname
-smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject
-" >> /etc/postfix/main.cf
+smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | tee /etc/postfix/main.cfg
 
 # Deamon Restart
 systemctl restart postfix
