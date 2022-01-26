@@ -6,11 +6,13 @@ if [[ $dnsmail == "Y" ]]
 then
 read -p "Internal network interface? (¿enp0s8?) --> " intif
 servip=$(ip a | grep "inet" | grep $intif | awk '{print $2}' | awk -F / '{print $1}')
+servzero=$(cat /etc/dhcp/dhcpd.cond | grep -m1 "option domain-name-servers" | awk -F " " '{print $3}' | awk -F ";" '{print $1}')
 ddom=$(cat /etc/dhcp/dhcpd.conf | grep "option domain-name " | awk -F \" '{print $2}')
 read -p "name of entry (¿mail?) --> " mailentry
 echo "$mailentry     IN      A       $servip" >> /var/named/named."$ddom"
 else "Dope"
 fi
+
 
 # Resetting DNS daemon
 systemctl restart named
@@ -95,7 +97,7 @@ mail_owner = postfix
 # from gethostname(). \$myhostname is used as a default value for many
 # other configuration parameters.
 #
-myhostname = $(hostname)
+myhostname = $(cat /etc/hostname)
 #myhostname = virtual.domain.tld
 
 # The mydomain parameter specifies the local internet domain name.
@@ -103,7 +105,7 @@ myhostname = $(hostname)
 # \$mydomain is used as a default value for many other configuration
 # parameters.
 #
-mydomain=$ddom
+mydomain = $ddom
 
 # SENDING MAIL
 # 
@@ -134,9 +136,9 @@ myorigin = \$mydomain
 # Note: you need to stop/start Postfix when this parameter changes.
 #
 inet_interfaces = all
-#inet_interfaces = \$myhostname
-#inet_interfaces = \$myhostname, localhost
-inet_interfaces = localhost
+# inet_interfaces = \$myhostname
+# inet_interfaces = \$myhostname, localhost
+# inet_interfaces = localhost
 
 # Enable IPv4, and IPv6 if supported
 inet_protocols = all
@@ -284,7 +286,7 @@ unknown_local_recipient_reject_code = 550
 # of listing the patterns here. Specify type:table for table-based lookups
 # (the value on the table right-hand side is not used).
 #
-mynetworks = 127.0.0.1/8, $servip/24
+mynetworks = 127.0.0.1/8, $servzero/24
 #mynetworks = \$config_directory/mynetworks
 #mynetworks = hash:/etc/postfix/network_table
 
@@ -369,7 +371,7 @@ mynetworks = 127.0.0.1/8, $servip/24
 # Specify 0 to disable the feature. Valid delays are 0..10.
 # 
 #in_flow_delay = 1s
-" | tee /etc/postfix/main.cf
+" > /etc/postfix/main.cf
 
 echo "# ADDRESS REWRITING
 #
@@ -541,7 +543,7 @@ home_mailbox = Maildir/
 # \$recipient (full recipient address), \$extension (recipient address
 # extension), \$domain (recipient domain), \$local (entire recipient
 # localpart), \$recipient_delimiter. Specify ${name?value} or
-# ${name:value} to expand value only when \$name does (does not) exist.
+# ${name":"value} to expand value only when \$name does (does not) exist.
 #
 # luser_relay works only for the default Postfix local delivery agent.
 #
@@ -553,7 +555,7 @@ home_mailbox = Maildir/
 #luser_relay = \$user@other.host
 #luser_relay = \$local@other.host
 #luser_relay = admin+\$local
-" | tee -a /etc/postfix/main.cf
+" >> /etc/postfix/main.cf
 echo "
 # JUNK MAIL CONTROLS
 # 
@@ -712,7 +714,7 @@ smtpd_sasl_path = private/auth
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
 smtpd_sasl_local_domain = \$myhostname
-smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | tee -a /etc/postfix/main.cf
+smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" >> /etc/postfix/main.cf
 
 # Deamon Restart
 systemctl restart postfix
@@ -834,7 +836,7 @@ dict {
 !include_try local.conf
 " > /etc/dovecot/dovecot.conf
 
-# conff.d/10-auth.conf
+# conf.d/10-auth.conf
 echo "
 ##
 ## Authentication processes
@@ -1479,9 +1481,9 @@ service auth {
 
   # Postfix smtp-auth
   unix_listener /var/spool/postfix/private/auth {
-	mode = 0666
-	user = postfix
-	group = postfix
+	  mode = 0666
+	  user = postfix
+	  group = postfix
   }
 
   # Auth process is run as this user.
