@@ -1598,6 +1598,6 @@ fi
 yum -y install mailx
 
 # PATH Environment
-echo "export MAIL=/home/$mailuser/Maildir" >> /etc/profile
+echo "export MAIL=$HOME/Maildir" >> /etc/profile
 
 echo GOOD LUCK
