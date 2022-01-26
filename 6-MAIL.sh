@@ -369,8 +369,9 @@ mynetworks = 127.0.0.1/8, $servip/24
 # Specify 0 to disable the feature. Valid delays are 0..10.
 # 
 #in_flow_delay = 1s
+" | tee /etc/postfix/main.cf
 
-# ADDRESS REWRITING
+echo "# ADDRESS REWRITING
 #
 # The ADDRESS_REWRITING_README document gives information about
 # address masquerading or other forms of address rewriting including
@@ -552,7 +553,8 @@ home_mailbox = Maildir/
 #luser_relay = \$user@other.host
 #luser_relay = \$local@other.host
 #luser_relay = admin+\$local
-  
+" | tee -a /etc/postfix/main.cf
+echo "
 # JUNK MAIL CONTROLS
 # 
 # The controls listed here are only a very small subset. The file
@@ -710,7 +712,7 @@ smtpd_sasl_path = private/auth
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
 smtpd_sasl_local_domain = \$myhostname
-smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | tee /etc/postfix/main.cfg
+smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | tee -a /etc/postfix/main.cf
 
 # Deamon Restart
 systemctl restart postfix
