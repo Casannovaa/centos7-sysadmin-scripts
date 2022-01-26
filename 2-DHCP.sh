@@ -23,7 +23,7 @@ option domain-name-servers '$ipp';
 default-lease-time 86400;
 max-lease-time 172800;
 authoritative;
-subnet '$ip' netmask '$mask' {
+subnet '$ipp' netmask '$mask' {
 	range dynamic-bootp '$initial' '$end';
 	option domain-name-servers '$gateway', '$dns';
 	option broadcast-address '$broadcast';
