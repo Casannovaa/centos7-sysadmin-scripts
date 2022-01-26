@@ -133,4 +133,4 @@ echo "
 @               IN      NS      $hst.
 
 ; Registres
-$name       IN      A       $servip" > /var/named."$ddom"
+$name       IN      A       $servip" > /var/named/named."$ddom"
