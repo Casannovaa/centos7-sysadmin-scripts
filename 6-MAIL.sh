@@ -6,7 +6,7 @@ if [[ $dnsmail == "Y" ]]
 then
 read -p "Internal network interface? (¿enp0s8?) --> " intif
 servip=$(ip a | grep "inet" | grep $intif | awk '{print $2}' | awk -F / '{print $1}')
-servzero=$(cat /etc/dhcp/dhcpd.cond | grep -m1 "option domain-name-servers" | awk -F " " '{print $3}' | awk -F ";" '{print $1}')
+servzero=$(cat /etc/dhcp/dhcpd.conf | grep -m1 "option domain-name-servers" | awk -F " " '{print $3}' | awk -F ";" '{print $1}')
 ddom=$(cat /etc/dhcp/dhcpd.conf | grep "option domain-name " | awk -F \" '{print $2}')
 read -p "name of entry (¿mail?) --> " mailentry
 echo "$mailentry     IN      A       $servip" >> /var/named/named."$ddom"
@@ -371,7 +371,7 @@ mynetworks = 127.0.0.1/8, $servzero/24
 # Specify 0 to disable the feature. Valid delays are 0..10.
 # 
 #in_flow_delay = 1s
-" > /etc/postfix/main.cf
+" | tee /etc/postfix/main.cf
 
 echo "# ADDRESS REWRITING
 #
@@ -555,7 +555,7 @@ home_mailbox = Maildir/
 #luser_relay = \$user@other.host
 #luser_relay = \$local@other.host
 #luser_relay = admin+\$local
-" >> /etc/postfix/main.cf
+" | tee -a /etc/postfix/main.cf
 echo "
 # JUNK MAIL CONTROLS
 # 
@@ -714,7 +714,7 @@ smtpd_sasl_path = private/auth
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
 smtpd_sasl_local_domain = \$myhostname
-smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" >> /etc/postfix/main.cf
+smtpd_recipient_restrictions = permit_mynetworks permit_auth_destination permit_sasl_authenticated, reject" | tee -a /etc/postfix/main.cf
 
 # Deamon Restart
 systemctl restart postfix
