@@ -1480,11 +1480,11 @@ service auth {
   }
 
   # Postfix smtp-auth
-  unix_listener /var/spool/postfix/private/auth {
-	  mode = 0666
-	  user = postfix
-	  group = postfix
-  }
+unix_listener /var/spool/postfix/private/auth {
+  mode = 0666
+  user = postfix
+  group = postfix
+ }
 
   # Auth process is run as this user.
   #user = \$default_internal_user
@@ -1598,7 +1598,5 @@ fi
 yum -y install mailx
 
 # PATH Environment
-mkdir /home/$mailuser/Maildir
-echo "export MAIL=/home/$mailuser/Maildir" >> /etc/profile
-
+su $mailuser -c "echo "export MAIL=$HOME/Maildir" >> /etc/profile"
 echo GOOD LUCK
