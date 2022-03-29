@@ -196,7 +196,7 @@ elif [[ "$install" == "4" ]]; then
 elif [[ "$install" == "5" ]]; then
     echo "Webtools selected"
     sleep 1
-    yum -y install wget zip
+    yum -y install wget zip unzip
     clear
     echo "-------------------"
     echo "1 --> Piwik (Matomo)"
