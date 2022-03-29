@@ -218,7 +218,7 @@ elif [[ "$install" == "5" ]]; then
         mysql -u root -p -e "grant all privileges on piwik.* to piwik@'localhost' identified by 'password';"
         echo "flush privileges;"
         mysql -u root -p -e "flush privileges;"
-        sed -i 's/memory_limit = 128M/memory_limit = 512M/g'
+        sed -i 's/memory_limit = 128M/memory_limit = 512M/g' php.ini
         wget http://piwik.org/latest.zip -P /var/www/html
         unzip /var/www/html/latest.zip -d /var/www/html
         chown -R apache. /var/www/html/matomo/tmp
