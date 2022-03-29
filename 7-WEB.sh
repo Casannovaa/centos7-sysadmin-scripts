@@ -190,7 +190,7 @@ elif [[ "$install" == "4" ]]; then
     #    <Directory /usr/share/phpMyAdmin/>
     #        SecRuleInheritance Off
     #    </Directory>
-    #</IfModule>" > /etc/httpd/cond.d/phpMyAdmin.php
+    #</IfModule>" > /etc/httpd/conf.d/phpMyAdmin.php
     systemctl restart httpd php*
 
 elif [[ "$install" == "5" ]]; then
