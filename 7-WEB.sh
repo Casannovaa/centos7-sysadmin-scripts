@@ -86,7 +86,7 @@ elif [[ "$install" == "3" ]]; then
     clear
     echo "firewall rules"
     sleep 2
-    firewall-cmd --add-service=mysql --permanent
+    firewall-cmd --add-service=mysql --permanent --zone=internal
     firewall-cmd --reload
 
 elif [[ "$install" == "4" ]]; then
