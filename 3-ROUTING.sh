@@ -1,9 +1,7 @@
 #!/bin/bash
-
 #Routing
 echo "Routing..."
 firewall-cmd --get-active-zone
-
 read -p "External network interface ¿enp0s3? > " ifext
 read -p "Internal network interface ¿enp0s8? > " ifint 
 
@@ -33,7 +31,6 @@ if [ "$confi" == "1" ]
 then
 	cat /proc/sys/net/ipv4/ip_forward
 	echo "It seems ok..."
-    sleep 1
 fi
 
 firewall-cmd --zone=internal --add-masquerade --permanent
@@ -44,4 +41,4 @@ firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i $ifext -o $ifint -m st
 firewall-cmd --reload
 
 clear
-echo "Succesfully Configured"
+echo "Succesfully Configured, Restart needed"
