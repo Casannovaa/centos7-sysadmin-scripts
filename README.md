@@ -1,4 +1,4 @@
-# CentOS Server Automation Scripts (VM)
+# CentOS7 Server Automation Scripts (VM)
 
 [Tested on Virtualbox & CentOS7]
 
