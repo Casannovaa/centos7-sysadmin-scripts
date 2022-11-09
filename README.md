@@ -2,6 +2,8 @@
 
 [Tested on Virtualbox & CentOS7]
 
+Only working with two interfaces (NAT and Internal Network)
+
 Instructions
 
 1. ifup the interface 3 before running anything!!! >> (ifup enp0s3)
