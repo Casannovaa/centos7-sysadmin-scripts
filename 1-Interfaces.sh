@@ -2,7 +2,6 @@
 
 # Installation of Tools
 echo "Installing Basic Tools"
-sleep 0.5
 yum -y install nano net-tools
 
 # Information Gathering for Interface Configuration
@@ -54,6 +53,4 @@ NETMASK='$mask'
 PREFIX='$prefix'
 ' > /etc/sysconfig/network-scripts/ifcfg-enp0s8
 
-echo Rebooting...
-sleep 1
 /sbin/reboot
