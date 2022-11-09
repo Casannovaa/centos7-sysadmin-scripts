@@ -1,8 +1,6 @@
 #!/bin/bash
-
 #DHCP Deamon Installation
 echo "Installing DHCP..."
-sleep 1
 yum -y install dhcp
 clear
 
@@ -15,7 +13,6 @@ read -p "End IP Range > " end
 read -p "DNS > " dns
 read -p "Broadcast Address > " broadcast
 read -p "Default Gateway > " gateway
-
 
 # /etc/dhcp/dhcpd.conf Configuration
 echo 'option domain-name "'$domain'";
@@ -30,7 +27,6 @@ subnet '$ipp' netmask '$mask' {
 	option routers '$gateway';
 	option domain-name-servers '$gateway';
 }' > /etc/dhcp/dhcpd.conf
-
 
 # DHCP Daemon Initialization
 echo Starting Service
